@@ -4,7 +4,34 @@ import UploadIcon from "../../assets/image.svg"
 import axios from "axios"
 import { useState } from "react"
 import ProgressBar from "../Progress"
+import {FaCheckCircle} from "react-icons/fa"
 
+const LinkPreview=({Copylink})=>{
+    console.log(JSON.stringify(Copylink))
+    const handleClick=()=>{
+        navigator.clipboard.writeText(Copylink)
+    }
+    return(
+        <div className="text-[#4F4F4F] text-xs text-center gap-4
+        border-1 border-[#E0E0E0] p-2 flex justify-between items-center bg-[#F6F8FB]">
+            <a href={Copylink} target="_blank">{Copylink}</a>
+            <button className="rounded-lg bg-[#2F80ED] p-4 text-white"
+            onClick={handleClick}>Copy Link</button>
+        </div>
+    )
+}
+
+const Result=({image})=>{
+    console.log(image)
+    return(
+        <div className="flex flex-col justify-around items-center p-8 gap-4">
+            <FaCheckCircle color="green"/>
+            <p className="text-[#4F4F4F] text-lg font-medium">Uploaded Successfully</p>
+            <img src={image} alt="uploaded-image" className="m-auto rounded-xl" width="338px" height="224.397px"/>
+            <LinkPreview Copylink={image}/>
+        </div>
+    )
+}
 
 
 const UploadContainer=()=>{
@@ -87,7 +114,7 @@ const Upload=()=>{
             }
             {
                 (uploadStatus.isUploaded) &&
-                <img src={image} alt="image"/>
+                <Result image={image}/>
             }
         </div>
     )
