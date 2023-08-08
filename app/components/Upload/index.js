@@ -38,7 +38,9 @@ const Upload=()=>{
                 },
             })
             setImage(data.success?data.url:null)
-            setUploadStatus((prevState)=>({...prevState,isUploaded:true}))
+            setTimeout(() => {
+                setUploadStatus({ isUploading: false, isUploaded: true });
+            }, 2000);
         }
         catch(err){
             console.error(err)
@@ -52,6 +54,7 @@ const Upload=()=>{
         input.onchange=(e)=>{
             console.log(e.target.files)
             uploadFile(e.target.files[0])
+            setUploadStatus({ isUploading: true, isUploaded: false });
         }
         input.click()
         
