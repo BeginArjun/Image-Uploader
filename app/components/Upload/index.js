@@ -34,13 +34,32 @@ const Result=({image})=>{
 }
 
 
-const UploadContainer=()=>{
+const UploadContainer=({uploadFile,setUploadStatus})=>{
+    const handleDrop = async(event) => {
+         event.preventDefault();
+        const droppedFile = event.dataTransfer.files[0];
+
+        const formData = new FormData();
+        formData.append('image', droppedFile);
+        setUploadStatus({ isUploading: true, isUploaded: false });
+        try {
+            await uploadFile(formData);
+        } catch (error) {
+            console.error(error);
+        }
+      };
+    
+      const handleDragOver = (event) => {
+        event.preventDefault();
+      };
     return(
         <div className="">
             <form encType="multipart/form-data" className="h-full" id="Dragform">
                 <input id="imgDrop" type="file" name="image" alt="" className="hidden"/>
-                <label className="flex flex-col items-center justify-around border border-dashed border-[#97BEF4] rounded-xl h-[218.903px] w-[338px] p-[0.75rem] bg-[#F6F8FB]" 
-                for="imgDrop">
+                <label id="drop" className="flex flex-col items-center justify-around border border-dashed border-[#97BEF4] rounded-xl h-[218.903px] w-[338px] p-[0.75rem] bg-[#F6F8FB]" 
+                for="imgDrop"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}>
                 <Image src={UploadIcon} alt="upload-icon" className="max-w-[114.131px] max-h-[88.241px]"/>
                 <p className="text-xs text-[#BDBDBD] -tracking-tighter">Drag and Drop Image here</p>
                 </label>
@@ -55,15 +74,14 @@ const Upload=()=>{
     const [image,setImage]=useState(null)
     const [uploadStatus,setUploadStatus]=useState({isUploading:false,isUploaded:false})
 
-    const uploadFile=async(file)=>{
-        const Imgform=document.getElementById('Dragform')
-        const formData=new FormData(Imgform)
+    const uploadFile=async(formData)=>{
         try{
-            const {data}=await axios.post('/upload',formData,{
+            const {data,config}=await axios.post('/upload',formData,{
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             })
+            console.log(config)
             setImage(data.success?data.url:null)
             setTimeout(() => {
                 setUploadStatus({ isUploading: false, isUploaded: true });
@@ -80,7 +98,9 @@ const Upload=()=>{
         const input=document.getElementById('imgDrop')
         input.onchange=(e)=>{
             console.log(e.target.files)
-            uploadFile(e.target.files[0])
+            const formData = new FormData();
+            formData.append('image', e.target.files[0]);
+            uploadFile(formData)
             setUploadStatus({ isUploading: true, isUploaded: false });
         }
         input.click()
@@ -103,7 +123,7 @@ const Upload=()=>{
                 
                 <p className="text-[#4F4F4F] text-lg">Upload your Image</p>
                 <p className="text-[#828282] text-xs">File should .jpeg, .png</p>
-                <UploadContainer/>
+                <UploadContainer uploadFile={uploadFile} setUploadStatus={setUploadStatus}/>
                 <p className="text-[#BDBDBD] text-xs font-medium -tracking-tighter">Or</p>
                 <UploadBtn/>
             </div>
